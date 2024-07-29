@@ -1,28 +1,33 @@
 import mysql.connector
+from mysql.connector import errorcode
 
-host = "127.0.0.1"
-user = "root"
-password = "0924475152@os"
+def create_database():
+    try:
+        
+        conn = mysql.connector.connect(
+            host='124.0.0.1',
+            user='root',
+            password='0924475152@os'
+        )
+        
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("CREATE DATABASE IF NOT EXISTS alx_book_store")
+            print("Database 'alx_book_store' created successfully!")
+        except mysql.connector.Error as err:
+            print(f"Failed creating database: {err}")
+        
+        cursor.close()
+        conn.close()
+    
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
 
-try:
-    db = mysql.connector.connect(
-        host=host,
-        user=user,
-        password=password
-    )
-
-    cursor = db.cursor()
-
-    cursor.execute("SHOW DATABASES;")
-    databases = [db[0] for db in cursor]
-    if "alx_book_store" in databases:
-        print("Database 'alx_book_store' already exists.")
-    else:
-        cursor.execute("CREATE DATABASE alx_book_store;")
-        print("Database 'alx_book_store' created successfully!")
-
-    cursor.close()
-    db.close()
-
-except mysql.connector.Error as e:
-    print(f"Error occurred: {e}")
+if __name__ == "__main__":
+    create_database()
